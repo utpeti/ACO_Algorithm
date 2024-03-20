@@ -41,8 +41,19 @@ def get_neighbors(point, points_set):
                 neighbors.append(points_set[neighbor])
     return neighbors
 
-def ant_solution_build():
+def choose_probability():
     pass
+
+def ant_solution_build(points_set, start_p, finish_p, alpha, beta):
+    energy = 0
+
+    current_point = start_p
+    while current_point != finish_p:
+        neighbor_p = []
+        for neighbor in get_neighbors(current_point, points_set):
+            neighbor_p.append(choose_probability(neighbor, alpha, beta)) #TODO: finish argument list
+    
+    return energy
 
 def daemon_step():
     pass
@@ -50,27 +61,29 @@ def daemon_step():
 def feromon_update():
     pass
 
-def aco_algorithm(antmap, start, finish, itr_nr):
+def aco_algorithm(antmap, start, finish, ant_nr):
     start_p, finish_p = get_end_points(start, finish, antmap)
     points_set = {point[:2]: point for point in antmap}
+    alpha = 1.0
+    beta = 1.0
     
-    min_energy = math.inf
+    max_left_energy = 0
     i = 0
-    while i < itr_nr:
-        current_energy = ant_solution_build()
+    while i < ant_nr:
+        current_energy = ant_solution_build(points_set, start_p, finish_p, alpha, beta)
         daemon_step()
         feromon_update()
-        if current_energy < min_energy:
-            min_energy = current_energy
+        if current_energy > max_left_energy:
+            max_left_energy = current_energy
         i += 1
 
-    return min_energy
+    return max_left_energy
 
 
 def main():
     antmap = read_points('aco_points_512x512.txt')
     start, finish = read_end_points('aco_start_end_512x512.txt')
-    aco_algorithm(antmap, start, finish, )
+    aco_algorithm(antmap, start, finish, 100)
 
 if __name__ == '__main__':
     main()
